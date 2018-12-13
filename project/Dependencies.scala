@@ -8,7 +8,7 @@ object Dependencies {
 
   object Version {
     // Modules Libraries
-    lazy val circeDerivation = "1.0.0"
+    lazy val circeDerivation = "0.10.0-SNAPSHOT"
     // LIBRARIES
     lazy val scala = "2.12.6"
     lazy val circe = "0.10.0"
@@ -40,18 +40,14 @@ object Dependencies {
     lazy val actor: ModuleID = "com.typesafe.akka" %% "akka-actor" % Version.Akka.main
     lazy val slf4j: ModuleID = "com.typesafe.akka" %% "akka-slf4j" % Version.Akka.main
     lazy val testkit: ModuleID = "com.typesafe.akka" %% "akka-testkit" % Version.Akka.main
-    lazy val contrib: ModuleID = "com.typesafe.akka" %% "akka-contrib" % Version.Akka.main
-    lazy val remote: ModuleID = "com.typesafe.akka" %% "akka-remote" % Version.Akka.main
     lazy val agent: ModuleID = "com.typesafe.akka" %% "akka-agent" % Version.Akka.main
     lazy val stream: ModuleID = "com.typesafe.akka" %% "akka-stream" % Version.Akka.main
     lazy val streamTestkit: ModuleID = "com.typesafe.akka" %% "akka-stream-testkit" % Version.Akka.main
-    lazy val clusterSharding: ModuleID = "com.typesafe.akka" %% "akka-cluster-sharding" % Version.Akka.main
 
     object Http {
       lazy val base: ModuleID = "com.typesafe.akka" %% "akka-http" % Version.Akka.Http.main
       lazy val core: ModuleID = "com.typesafe.akka" %% "akka-http-core" % Version.Akka.Http.main
       lazy val testkit: ModuleID = "com.typesafe.akka" %% "akka-http-testkit" % Version.Akka.Http.main
-      lazy val sprayJson: ModuleID = "com.typesafe.akka" %% "akka-http-spray-json" % Version.Akka.Http.main
       lazy val sse: ModuleID = "de.heikoseeberger" %% "akka-sse" % "3.0.0"
       lazy val session: ModuleID = "com.softwaremill.akka-http-session" %% "core" % "0.5.6"
       lazy val sessionJwt: ModuleID = "com.softwaremill.akka-http-session" %% "jwt" % "0.5.6"
@@ -72,6 +68,7 @@ object Dependencies {
     lazy val java8 = Def.setting("io.circe" %%% "circe-java8" % Version.circe)
     lazy val testing =
       Def.setting("io.circe" %%% "circe-testing" % Version.circe)
+    lazy val derivation= Def.setting("io.megl" %%% "circe-derivation-annotations" % Version.circeDerivation)
   }
 
   object Enumeratum {
@@ -130,33 +127,27 @@ object Dependencies {
     lazy val config = "com.typesafe" % "config" % "1.3.3"
   }
 
-  lazy val circeDerivation = Def.settings {
-    libraryDependencies ++= DependencyHelpers.compile(
-      Circe.parser.value,
-      Circe.core.value,
-      Circe.java8.value,
-      Enumeratum.circe.value,
-      "org.typelevel" %%% "macro-compat" % "1.1.1"
-    ) ++ DependencyHelpers.test(Circe.testing.value)
-  }
-
-  lazy val commonUtilsJVM = Def.settings {
-    libraryDependencies ++= DependencyHelpers.compile(
-      Scala.logging,
-      TypeSafe.config
-    ) ++ DependencyHelpers.provided(Libraries.logback)
-  }
-
 
   lazy val wsWireCore = Def.settings {
     libraryDependencies ++= Seq(
-      Libraries.shapeless.value
+      Circe.derivation.value,
+      Circe.java8.value,
+      Enumeratum.circe.value,
+      Libraries.shapeless.value,
+      Libraries.magnolia.value
+    )
+  }
+
+  lazy val wsWireCoreJS = Def.settings {
+    libraryDependencies ++= Seq(
+      Libraries.scalaJavaTime.value
     )
   }
 
 
   lazy val wsWireServer = Def.settings {
     libraryDependencies ++= Seq(
+      Circe.parser.value,
       Libraries.pureconfig,
       Akka.Http.core,
       Akka.AkkaHTTPJson.circe,
@@ -168,6 +159,7 @@ object Dependencies {
 
   lazy val wsWireClientJVM = Def.settings {
     libraryDependencies ++= Seq(
+      Circe.parser.value,
       Libraries.pureconfig,
       Akka.Http.core,
       Akka.AkkaHTTPJson.circe,
@@ -179,6 +171,7 @@ object Dependencies {
 
   lazy val wsWireClientJS = Def.settings {
     libraryDependencies ++= Seq(
+      Circe.parser.value,
       Libraries.autowire.value
     )
   }

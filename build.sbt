@@ -16,7 +16,9 @@ lazy val root = project
   .settings(name := "wswire-root", publishArtifact := false)
   .aggregate(
     wsWireCoreJVM,
-    wsWireCoreJS
+    wsWireCoreJS,
+    wsWireOpenApiJVM,
+    wsWireOpenApiJS
   )
 
 lazy val wsWireCore =
@@ -27,12 +29,22 @@ lazy val wsWireCore =
 
 lazy val wsWireCoreJVM = wsWireCore.jvm
 lazy val wsWireCoreJS = wsWireCore.js
+  .settings(Dependencies.wsWireCoreJS)
+
+lazy val wsWireOpenApi =
+  ProjectUtils
+    .setupCrossModule("openapi", crossType = CrossType.Pure)
+    .dependsOn(testSupport % Test)
+
+lazy val wsWireOpenApiJVM = wsWireOpenApi.jvm
+lazy val wsWireOpenApiJS = wsWireOpenApi.js
+
 
 lazy val wsWireServer =
   ProjectUtils
     .setupJVMProject("akka-server")
     .settings(Dependencies.wsWireServer)
-    .dependsOn(wsWireCoreJVM, testSupportJVM % Test)
+    .dependsOn(wsWireCoreJVM, wsWireOpenApiJVM,  testSupportJVM % Test)
 
 /*
 lazy val wsWireClient =
